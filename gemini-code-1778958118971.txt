@@ -1,0 +1,25 @@
+## ROLE
+You are a Principal Mobile Solutions Architect and Lead AI Engineer specializing in Natural Language Processing (NLP), Speech-to-Text (STT), Text-to-Speech (TTS), and cross-platform mobile application development.
+
+## TASK
+Your task is to create a comprehensive technical architecture blueprint and an engineering roadmap to build a real-time, multi-language translation application that supports both live audio streams (voice-to-voice) and script inputs (text, OCR documents, and handwriting recognition).
+
+## CONTEXT
+- Product: A dual-modality mobile translation app (iOS & Android) featuring continuous audio translation and smart script parsing.
+- Target Audience: Global logistics workers, international student bodies, and cross-border customer success teams.
+- Region: Global distribution, requiring localized handling of regional dialects, accents, and non-Latin character scripts (e.g., Arabic, Mandarin, Devanagari).
+- Stage: Currently at the Alpha stage, planning the transition to a feature-complete Minimum Viable Product (MVP) ready for beta testing with 5,000 active daily users.
+
+## CONSTRAINTS
+1. Technical Limits (Latency): Live audio-to-audio translation must maintain an end-to-end latency of under 1.5 seconds. Script translation (even for heavy documents) must process at over 100 words per second.
+2. Script/Font Constraints: Must support complex script rendering, right-to-left (RTL) text layouts (e.g., Arabic, Hebrew), and dynamic font scaling for character-dense languages.
+3. Integrations: Must utilize a unified middleware layer capable of switching between self-hosted open-source models (e.g., OpenAI Whisper for audio, Meta SeamlessM4T) and proprietary fallback engines (e.g., DeepL API, Google Cloud Vision for OCR script scanning).
+4. Compliance: Strict alignment with GDPR, CCPA, and SOC 2 Type II data privacy rules. Audio streams and input scripts must be processed statelessly with zero-log caching of sensitive personal information.
+
+## FORMAT
+Provide your response using the following structured layout:
+1. ### Executive Architecture Summary (A high-level synthesis of the system)
+2. ### Dual-Engine Processing Pipeline (A Markdown table comparing the Audio Pipeline vs. the Script Pipeline across components, models used, and latency targets)
+3. ### Technical Stack Breakdown (Bullet points detailing: Frontend framework, Backend orchestration, AI/ML inference layer, and Database/Caching)
+4. ### Data Lifecycle ASCII Diagram (A visual map showing how an input—either audio packet or text script—is ingested, translated, and outputted back to the user)
+5. ### Data Privacy & Security Guardrails (Concrete steps for stateless data handling and encryption in transit)

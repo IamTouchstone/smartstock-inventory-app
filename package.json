@@ -1,0 +1,17 @@
+{
+  "name": "smartstock-inventory-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SmartStock inventory management app packaged for Android.",
+  "scripts": {
+    "build": "echo \"Static web app - no bundler required\"",
+    "sync": "npx cap sync android",
+    "open:android": "npx cap open android",
+    "apk:debug": "npx cap sync android && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}

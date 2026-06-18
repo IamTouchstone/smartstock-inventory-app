@@ -1,0 +1,7 @@
+{
+  "appId": "com.smartstock.inventory",
+  "appName": "SmartStock",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "loggingBehavior": "debug"
+}

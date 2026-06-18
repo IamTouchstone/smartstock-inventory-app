@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartStock — Lagos Retail Inventory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --off-black: #0f1108;
+      --gunmetal: #12151a;
+      --cassava: #e8eaed;
+      --ankara: #22c55e;
+      --ankara-dark: #16a34a;
+      --cyan: #22d3ee;
+      --amber: #f59e0b;
+      --red-ops: #ef4444;
+      --text-muted: #94a3b8;
+      --border: #2a3140;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      font-family: 'Familjen Grotesk', system-ui, sans-serif;
+      background-color: var(--gunmetal);
+      background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--cassava);
+      line-height: 1.5;
+    }
+    .display-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .alert-ticker {
+      background: linear-gradient(90deg, #1a1408 0%, #2a1f08 50%, #1a1408 100%);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+      overflow: hidden;
+      padding: 0.5rem 0;
+    }
+    .ticker-track {
+      display: flex;
+      gap: 3rem;
+      animation: ticker-scroll 40s linear infinite;
+      white-space: nowrap;
+      font-size: 0.8rem;
+      color: var(--amber);
+    }
+    .ticker-track span::before {
+      content: '●';
+      color: var(--red-ops);
+      margin-right: 0.5rem;
+      font-size: 0.55rem;
+      vertical-align: middle;
+    }
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .operations-hub {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 1rem;
+    }
+    .operations-hub h2 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.35rem;
+    }
+  </style>
+  <style>
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 1rem;
+      background: var(--ankara);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      z-index: 9999;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 17, 8, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(29, 154, 95, 0.3);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .logo {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--cassava);
+      text-decoration: none;
+    }
+    .logo span { color: var(--cyan); }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: #c8c4b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    nav a:hover { color: var(--cyan); }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--off-black) 0%, #1a2418 45%, #0f1108 100%);
+      color: var(--cassava);
+      padding: 3rem 1.5rem 4rem;
+    }
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+    }
+    .hero h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--cyan);
+    }
+    .hero-lead {
+      color: #b8b4a8;
+      font-size: 1.05rem;
+      max-width: 32ch;
+      margin-bottom: 2rem;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: rgba(245, 241, 232, 0.06);
+      border: 1px solid rgba(29, 154, 95, 0.25);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8a8678;
+    }
+    .stat-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--cassava);
+      margin-top: 4px;
+    }
+
+    .add-form {
+      background: rgba(245, 241, 232, 0.05);
+      border: 1px solid rgba(29, 154, 95, 0.35);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .add-form h2 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: var(--cassava);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #9a9688;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      background: rgba(15, 17, 8, 0.6);
+      color: var(--cassava);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    input:focus, select:focus {
+      outline: 2px solid var(--ankara);
+      outline-offset: 2px;
+    }
+    #btn-primary {
+      grid-column: 1 / -1;
+      margin-top: 0.5rem;
+      padding: 0.85rem 1.5rem;
+      background: var(--cyan);
+      color: var(--gunmetal);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #btn-primary:hover { filter: brightness(1.1); }
+
+    /* Feature modules grid (#list-root) */
+    #list-root.feature-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    #list-root .feature-module {
+      background: #1a1f28;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      border-top: 4px solid var(--border);
+    }
+    #list-root .feature-module:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.15);
+    }
+    #list-root .feature-module.mod-cyan { border-top-color: var(--cyan); }
+    #list-root .feature-module.mod-amber { border-top-color: var(--amber); }
+    #list-root .feature-module.mod-green { border-top-color: var(--ankara); }
+    #list-root .feature-module.mod-red { border-top-color: var(--red-ops); }
+    #list-root .feature-module h4 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+      color: var(--cassava);
+    }
+    #list-root .feature-module p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    #list-root .module-stat {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.5rem;
+      margin-top: 0.5rem;
+      color: var(--ankara);
+    }
+    #list-root .module-stat.warn { color: var(--amber); }
+    #list-root .module-stat.alert { color: var(--red-ops); }
+
+    /* Main */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 3rem;
+    }
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .section-sub {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .toolbar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .toolbar input, .toolbar select {
+      background: var(--gunmetal);
+      border: 1px solid var(--border);
+      color: var(--cassava);
+      min-width: 200px;
+    }
+    .section-sub { color: var(--text-muted); }
+    .list-item { color: var(--cassava); }
+    .list-item .item-info p { color: var(--text-muted); }
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 1fr; }
+    }
+
+    #inventory-list {
+      list-style: none;
+      background: #1a1f28;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .item-info h4 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .item-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .stock-badge {
+      display: inline-block;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+    .stock-good { background: #ecfdf5; color: var(--ankara); }
+    .stock-low { background: #fef2f2; color: #dc2626; }
+
+    #insights-panel {
+      background: linear-gradient(160deg, var(--off-black) 0%, #1a2418 100%);
+      color: var(--cassava);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(29, 154, 95, 0.3);
+      position: sticky;
+      top: 5rem;
+    }
+    .insights-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .insights-header h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+    }
+    .insight-card {
+      background: rgba(245, 241, 232, 0.06);
+      border: 1px solid rgba(29, 154, 95, 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .insight-card strong {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ankara);
+    }
+
+    /* How it works */
+    .how-it-works {
+      margin-top: 4rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .step {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--ankara);
+      line-height: 1;
+    }
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      margin: 0.5rem 0 0.35rem;
+    }
+    .step p { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Footer */
+    footer {
+      background: var(--off-black);
+      color: #b8b4a8;
+      padding: 3rem 1.5rem;
+      margin-top: 2rem;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+    }
+    .footer-brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--cassava);
+    }
+    .footer-form {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-form input {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--cassava);
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      min-width: 220px;
+    }
+    .footer-form button {
+      padding: 0.65rem 1.25rem;
+      background: var(--ankara);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    footer p { font-size: 0.85rem; margin-top: 2rem; opacity: 0.7; }
+
+    /* Barcode scanner */
+    .barcode-section {
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .scanner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .scanner-grid { grid-template-columns: 1fr; }
+    }
+    .scanner-panel {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .scanner-viewport {
+      position: relative;
+      background: var(--off-black);
+      aspect-ratio: 4/3;
+      min-height: 220px;
+    }
+    #barcode-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .scanner-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #8a8678;
+      padding: 1.5rem;
+      text-align: center;
+      gap: 0.5rem;
+    }
+    .scanner-placeholder svg { opacity: 0.5; }
+    .scanner-scanline {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 50%;
+      height: 2px;
+      background: var(--ankara);
+      box-shadow: 0 0 12px var(--ankara);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .scanner-viewport.scanning .scanner-scanline {
+      opacity: 1;
+      animation: scan-pulse 2s ease-in-out infinite;
+    }
+    @keyframes scan-pulse {
+      0%, 100% { transform: translateY(-40px); opacity: 0.6; }
+      50% { transform: translateY(40px); opacity: 1; }
+    }
+    .scanner-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .btn-scanner {
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-scanner-primary {
+      background: var(--ankara);
+      color: #fff;
+    }
+    .btn-scanner-primary:hover { background: var(--ankara-dark); }
+    .btn-scanner-secondary {
+      background: var(--cassava);
+      color: var(--off-black);
+      border: 1px solid var(--border);
+    }
+    .btn-scanner:disabled { opacity: 0.5; cursor: not-allowed; }
+    .scanner-manual {
+      padding: 1.25rem;
+    }
+    .scanner-manual label { color: var(--text-muted); }
+    .scanner-manual input {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--off-black);
+      margin-bottom: 0.75rem;
+    }
+    .scanner-result {
+      background: linear-gradient(160deg, var(--off-black) 0%, #1a2418 100%);
+      color: var(--cassava);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(29, 154, 95, 0.3);
+      min-height: 200px;
+    }
+    .scanner-result h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    #barcode-result-content {
+      font-size: 0.95rem;
+      color: #b8b4a8;
+    }
+    #barcode-result-content.found { color: var(--cassava); }
+    .result-product-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--cassava);
+      margin: 0.5rem 0;
+    }
+    .result-barcode {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--ankara);
+      letter-spacing: 0.05em;
+    }
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .result-actions button {
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(29, 154, 95, 0.4);
+      background: rgba(29, 154, 95, 0.2);
+      color: var(--cassava);
+    }
+    .result-actions button:hover { background: var(--ankara); border-color: var(--ankara); }
+    .scanner-status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+    }
+    .list-item.highlight-scan {
+      background: #ecfdf5;
+      outline: 2px solid var(--ankara);
+      outline-offset: -2px;
+    }
+
+    /* Register by barcode */
+    .register-section {
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .register-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .register-layout { grid-template-columns: 1fr; }
+    }
+    .register-capture {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .register-capture h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .register-steps {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .register-step-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: var(--cassava);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .register-step-badge.active {
+      background: #ecfdf5;
+      color: var(--ankara);
+      border-color: var(--ankara);
+    }
+    .register-viewport {
+      position: relative;
+      background: var(--off-black);
+      border-radius: 12px;
+      aspect-ratio: 16/10;
+      min-height: 160px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    #register-barcode-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .register-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8a8678;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 1rem;
+    }
+    .register-barcode-display {
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ankara);
+      background: #ecfdf5;
+      border: 1px dashed var(--ankara);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      letter-spacing: 0.06em;
+      min-height: 2.75rem;
+    }
+    .register-barcode-display.empty {
+      color: var(--text-muted);
+      background: var(--cassava);
+      border-color: var(--border);
+      font-family: inherit;
+      font-weight: 400;
+      font-size: 0.9rem;
+    }
+    .register-capture input {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--off-black);
+      margin-bottom: 0.75rem;
+    }
+    .register-form-panel {
+      background: linear-gradient(160deg, var(--off-black) 0%, #1a2418 100%);
+      color: var(--cassava);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(29, 154, 95, 0.35);
+    }
+    .register-form-panel.disabled {
+      opacity: 0.65;
+      pointer-events: none;
+    }
+    .register-form-panel h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+    .register-form-panel .form-hint {
+      font-size: 0.85rem;
+      color: #8a8678;
+      margin-bottom: 1.25rem;
+    }
+    .register-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .register-form-grid .full { grid-column: 1 / -1; }
+    .register-form-panel label {
+      color: #9a9688;
+    }
+    .register-form-panel input,
+    .register-form-panel select {
+      background: rgba(15, 17, 8, 0.6);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--cassava);
+    }
+    .register-form-panel input:read-only {
+      opacity: 0.85;
+      cursor: not-allowed;
+    }
+    #btn-register-barcode {
+      grid-column: 1 / -1;
+      margin-top: 0.5rem;
+      padding: 0.9rem 1.5rem;
+      background: var(--ankara);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #btn-register-barcode:hover { background: var(--ankara-dark); }
+    #btn-register-barcode:disabled { opacity: 0.5; cursor: not-allowed; }
+    .register-alert {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .register-alert.visible { display: block; }
+    .register-alert.success {
+      background: rgba(29, 154, 95, 0.25);
+      border: 1px solid var(--ankara);
+      color: #a7f3d0;
+    }
+    .register-alert.warning {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid #fbbf24;
+      color: #fde68a;
+    }
+    .register-alert.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #f87171;
+      color: #fecaca;
+    }
+
+    /* Barcode generator & printer */
+    .printer-section {
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .printer-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .printer-layout { grid-template-columns: 1fr; }
+    }
+    .printer-controls {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .printer-controls h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .printer-controls label { color: var(--text-muted); }
+    .printer-controls input,
+    .printer-controls select {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--off-black);
+      margin-bottom: 0.75rem;
+    }
+    .printer-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .btn-printer {
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+    .btn-printer-primary { background: var(--ankara); color: #fff; }
+    .btn-printer-primary:hover { background: var(--ankara-dark); }
+    .btn-printer-secondary {
+      background: var(--cassava);
+      color: var(--off-black);
+      border: 1px solid var(--border);
+    }
+    .printer-preview-panel {
+      background: linear-gradient(160deg, var(--off-black) 0%, #1a2418 100%);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(29, 154, 95, 0.35);
+      color: var(--cassava);
+    }
+    .printer-preview-panel h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .label-preview-stage {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+    }
+    .label-preview-box {
+      text-align: center;
+      color: var(--off-black);
+      border: 2px dashed var(--border);
+      padding: 1rem 1.25rem;
+      background: #fff;
+    }
+    .label-preview-box.size-small { width: 180px; font-size: 0.75rem; }
+    .label-preview-box.size-standard { width: 260px; font-size: 0.85rem; }
+    .label-preview-box.size-large { width: 320px; font-size: 0.95rem; }
+    .label-store-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ankara);
+      margin-bottom: 4px;
+    }
+    .label-product-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      margin: 6px 0 4px;
+      line-height: 1.2;
+    }
+    .label-price {
+      font-weight: 700;
+      font-size: 1.15em;
+      color: var(--off-black);
+      margin: 6px 0 8px;
+    }
+    .label-preview-box svg { max-width: 100%; height: auto; }
+    .printer-hint {
+      font-size: 0.8rem;
+      color: #8a8678;
+      margin-top: 1rem;
+    }
+    .printer-machine-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(29, 154, 95, 0.2);
+      border: 1px solid rgba(29, 154, 95, 0.4);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Print-only label sheet */
+    #print-sheet { display: none; }
+    @media print {
+      body > *:not(#print-sheet) { display: none !important; }
+      #print-sheet {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .print-label {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        padding: 8mm;
+        margin: 4mm;
+        display: inline-block;
+        vertical-align: top;
+        text-align: center;
+        color: #000;
+        background: #fff;
+      }
+      .print-label.size-small { width: 50mm; min-height: 30mm; font-size: 8pt; }
+      .print-label.size-standard { width: 70mm; min-height: 40mm; font-size: 9pt; }
+      .print-label.size-large { width: 90mm; min-height: 50mm; font-size: 10pt; }
+      .print-label .label-store-name { font-size: 7pt; font-weight: bold; }
+      .print-label .label-product-name { font-weight: bold; margin: 2mm 0; }
+      .print-label .label-price { font-weight: bold; margin: 2mm 0; }
+      .print-label svg { max-width: 100%; }
+    }
+
+    .query-toolbar {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding: 1rem;
+      background: #1a1f28;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .query-toolbar label { color: var(--text-muted); font-size: 0.7rem; }
+    .query-toolbar input, .query-toolbar select {
+      background: var(--gunmetal);
+      border: 1px solid var(--border);
+      color: var(--cassava);
+    }
+    .charts-panel {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .charts-panel h4 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      color: var(--cyan);
+      margin-bottom: 0.75rem;
+    }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 100px;
+    }
+    .chart-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .chart-bar {
+      width: 100%;
+      max-width: 40px;
+      background: linear-gradient(180deg, var(--cyan), #0891b2);
+      border-radius: 4px 4px 0 0;
+      height: 0;
+      transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .chart-bar-label { font-size: 0.65rem; color: var(--text-muted); }
+    .ops-stub-panel {
+      background: #1a1f28;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 2rem;
+    }
+    .ops-stub-panel h3 { font-family: 'Oswald', sans-serif; font-size: 1rem; margin-bottom: 0.5rem; }
+    .pos-status { color: var(--ankara); font-weight: 600; }
+    .pos-status.offline { color: var(--amber); }
+    .ops-action-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 0.9rem;
+    }
+    .ops-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .ops-metric {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 0.8rem;
+    }
+    .ops-metric span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.25rem;
+    }
+    .ops-metric strong {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+    }
+    .file-button {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+    }
+    .file-button input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    @media (max-width: 700px) {
+      .ops-metric-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header>
+    <div class="header-inner">
+      <a href="#" class="logo" aria-label="SmartStock home">Smart<span>Stock</span></a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="#list-root">Modules</a></li>
+          <li><a href="#barcode-scanner">Scanner</a></li>
+          <li><a href="#barcode-register">Register</a></li>
+          <li><a href="#barcode-printer">Print</a></li>
+          <li><a href="#inventory">Inventory</a></li>
+          <li><a href="#insights-panel">Insights</a></li>
+          <li><a href="#data-tools">Data</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="alert-ticker" aria-live="polite">
+    <div class="ticker-track" id="alert-ticker-content">
+      <span>Loading operational alerts…</span>
+      <span>Loading operational alerts…</span>
+    </div>
+  </div>
+
+  <section class="operations-hub" aria-labelledby="ops-hub-heading">
+    <h2 id="ops-hub-heading" class="display-font">Operations Command Center</h2>
+    <p style="color:var(--text-muted);font-size:0.9rem;">11 integrated modules — live status from your store floor</p>
+    <ul id="list-root" class="feature-grid" aria-label="SmartStock feature modules"></ul>
+  </section>
+
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-inner">
+      <div>
+        <h1 id="hero-heading">Inventory that <em>thinks</em> like your store.</h1>
+        <p class="hero-lead">Real-time stock tracking, smart alerts, and Lagos-ready insights — built for modern retail.</p>
+        <div class="stats-row" aria-label="Quick statistics">
+          <div class="stat-card">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Low Stock</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Est. Daily Sales</div>
+            <div class="stat-value">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="add-form" role="form" aria-label="Add new product">
+        <h2>Add Product</h2>
+        <div class="form-grid">
+          <div class="full">
+            <label for="input-email">Manager Email</label>
+            <input type="email" id="input-email" placeholder="manager@store.com" aria-label="Manager email" />
+          </div>
+          <div class="full">
+            <label for="input-product-name">Product Name</label>
+            <input type="text" id="input-product-name" placeholder="e.g. Golden Penny Semolina" aria-required="true" />
+          </div>
+          <div class="full">
+            <label for="input-barcode">Barcode</label>
+            <input type="text" id="input-barcode" placeholder="Scan or enter EAN/UPC" inputmode="numeric" aria-label="Product barcode" />
+          </div>
+          <div>
+            <label for="input-reg-category">Category</label>
+            <select id="input-reg-category" aria-label="Product category">
+              <option value="food">Food</option>
+              <option value="beverages">Beverages</option>
+              <option value="dairy">Dairy</option>
+              <option value="household">Household</option>
+            </select>
+          </div>
+          <div>
+            <label for="input-quantity">Quantity</label>
+            <input type="number" id="input-quantity" value="50" min="0" aria-label="Quantity" />
+          </div>
+          <div>
+            <label for="input-cost-price">Cost Price (₦)</label>
+            <input type="number" id="input-cost-price" placeholder="280" min="0" aria-label="Cost price" />
+          </div>
+          <div>
+            <label for="input-selling-price">Selling Price (₦)</label>
+            <input type="number" id="input-selling-price" placeholder="350" min="1" aria-label="Selling price" />
+          </div>
+          <div>
+            <label for="input-expiry-date">Expiry Date</label>
+            <input type="date" id="input-expiry-date" aria-label="Expiry date" />
+          </div>
+          <div>
+            <label for="input-reorder-threshold">Reorder At</label>
+            <input type="number" id="input-reorder-threshold" value="25" min="1" aria-label="Reorder threshold" />
+          </div>
+          <div class="full">
+            <label for="input-supplier">Supplier</label>
+            <input type="text" id="input-supplier" placeholder="Supplier name" aria-label="Supplier" />
+          </div>
+          <button type="button" id="btn-primary" aria-label="Add product to inventory">+ Add to Inventory</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="main">
+    <section id="barcode-scanner" class="barcode-section" aria-labelledby="scanner-heading">
+      <h2 class="section-title" id="scanner-heading">Barcode Scanner</h2>
+      <p class="section-sub">Scan product barcodes to look up stock, adjust quantity, or pre-fill the add form. Works with camera or manual entry.</p>
+      <div class="scanner-grid">
+        <div class="scanner-panel">
+          <div class="scanner-viewport" id="scanner-viewport">
+            <video id="barcode-video" playsinline muted aria-label="Camera preview for barcode scanning"></video>
+            <div class="scanner-placeholder" id="scanner-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M7 12h10"/>
+              </svg>
+              <span>Camera preview appears when scanning</span>
+            </div>
+            <div class="scanner-scanline" aria-hidden="true"></div>
+          </div>
+          <div class="scanner-controls">
+            <button type="button" class="btn-scanner btn-scanner-primary" id="btn-barcode-scan" aria-label="Start camera barcode scan">Scan Barcode</button>
+            <button type="button" class="btn-scanner btn-scanner-secondary" id="btn-start-scan" aria-hidden="true" tabindex="-1">Start</button>
+            <button type="button" class="btn-scanner btn-scanner-secondary" id="btn-stop-scan" disabled aria-label="Stop camera scan">Stop</button>
+          </div>
+          <div class="scanner-manual">
+            <label for="barcode-manual-input">Or enter barcode manually</label>
+            <input type="text" id="barcode-manual-input" placeholder="e.g. 5449000000996" inputmode="numeric" aria-label="Manual barcode entry" />
+            <button type="button" class="btn-scanner btn-scanner-primary" id="btn-lookup-barcode" style="width:100%">Look Up Product</button>
+            <p class="scanner-status" id="scanner-support-msg" aria-live="polite"></p>
+          </div>
+        </div>
+        <div class="scanner-result" role="region" aria-label="Barcode scan result" aria-live="polite">
+          <h3>Scan Result</h3>
+          <div id="barcode-result-content">
+            <p>Scan a barcode or enter one above to look up a product in your inventory.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="barcode-register" class="register-section" aria-labelledby="register-heading">
+      <h2 class="section-title" id="register-heading">Register Product by Barcode</h2>
+      <p class="section-sub">Scan or enter a barcode first, then complete product details to add it to inventory. Each barcode can only be registered once.</p>
+      <div class="register-layout">
+        <div class="register-capture">
+          <div class="register-steps" aria-label="Registration steps">
+            <span class="register-step-badge active" id="reg-step-1">1. Capture Barcode</span>
+            <span class="register-step-badge" id="reg-step-2">2. Enter Details</span>
+          </div>
+          <h3>Step 1 — Barcode</h3>
+          <div class="register-viewport" id="register-viewport">
+            <video id="register-barcode-video" playsinline muted aria-label="Camera for barcode registration"></video>
+            <div class="register-placeholder" id="register-placeholder">Tap Start Scan to capture barcode</div>
+          </div>
+          <div class="scanner-controls" style="padding:0;border:none;margin-bottom:1rem;">
+            <button type="button" class="btn-scanner btn-scanner-primary" id="btn-register-scan-start" aria-label="Start scan for registration">Start Scan</button>
+            <button type="button" class="btn-scanner btn-scanner-secondary" id="btn-register-scan-stop" disabled aria-label="Stop registration scan">Stop</button>
+          </div>
+          <label for="register-barcode-input">Or type barcode</label>
+          <input type="text" id="register-barcode-input" placeholder="e.g. 5449000000996" inputmode="numeric" aria-label="Barcode for new product registration" />
+          <button type="button" class="btn-scanner btn-scanner-primary" id="btn-use-barcode" style="width:100%">Use This Barcode</button>
+          <p class="scanner-status" id="register-scan-msg" aria-live="polite"></p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;">Captured barcode:</p>
+          <div class="register-barcode-display empty" id="register-barcode-display" aria-live="polite">No barcode captured yet</div>
+        </div>
+
+        <div class="register-form-panel disabled" id="register-form-panel" aria-labelledby="register-form-title">
+          <h3 id="register-form-title">Step 2 — Product Details</h3>
+          <p class="form-hint">Complete the form after capturing a barcode above.</p>
+          <div class="register-form-grid" role="form" aria-label="Register product by barcode">
+            <div class="full">
+              <label for="reg-barcode-locked">Barcode (locked)</label>
+              <input type="text" id="reg-barcode-locked" readonly aria-readonly="true" aria-label="Locked barcode for registration" />
+            </div>
+            <div class="full">
+              <label for="reg-product-name">Product Name</label>
+              <input type="text" id="reg-product-name" placeholder="e.g. Golden Penny Semolina 1kg" aria-required="true" />
+            </div>
+            <div>
+              <label for="reg-product-category">Category</label>
+              <select id="reg-product-category" aria-label="Product category">
+                <option value="food">Food</option>
+                <option value="beverages">Beverages</option>
+                <option value="dairy">Dairy</option>
+                <option value="household">Household</option>
+              </select>
+            </div>
+            <div>
+              <label for="reg-product-qty">Opening Stock</label>
+              <input type="number" id="reg-product-qty" value="50" min="0" aria-label="Opening stock quantity" />
+            </div>
+            <div class="full">
+              <label for="reg-product-price">Price (₦)</label>
+              <input type="number" id="reg-product-price" placeholder="350" min="1" aria-label="Price in Naira" />
+            </div>
+            <div>
+              <label for="reg-product-cost">Cost Price (₦)</label>
+              <input type="number" id="reg-product-cost" placeholder="280" min="0" aria-label="Cost price in Naira" />
+            </div>
+            <div>
+              <label for="reg-product-threshold">Reorder At</label>
+              <input type="number" id="reg-product-threshold" value="25" min="1" aria-label="Reorder threshold" />
+            </div>
+            <div>
+              <label for="reg-product-expiry">Expiry Date</label>
+              <input type="date" id="reg-product-expiry" aria-label="Expiry date" />
+            </div>
+            <div>
+              <label for="reg-product-branch">Store Branch</label>
+              <select id="reg-product-branch" aria-label="Store branch">
+                <option value="lagos-main">Lagos Main</option>
+                <option value="ikeja">Ikeja</option>
+                <option value="lekki">Lekki</option>
+              </select>
+            </div>
+            <div class="full">
+              <label for="reg-product-supplier">Supplier</label>
+              <input type="text" id="reg-product-supplier" placeholder="Supplier name" aria-label="Supplier name" />
+            </div>
+            <button type="button" id="btn-register-barcode" disabled aria-label="Register product with barcode">Register Product</button>
+          </div>
+          <div class="register-alert" id="register-alert" role="alert" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="barcode-printer" class="printer-section" aria-labelledby="printer-heading">
+      <h2 class="section-title" id="printer-heading">Barcode Generator & Label Printer</h2>
+      <p class="section-sub">Generate scannable barcodes and print shelf labels for your label machine or office printer. Select from inventory or create custom labels.</p>
+      <div class="printer-layout">
+        <div class="printer-controls">
+          <span class="printer-machine-badge" aria-hidden="true">🖨️ Label Machine Ready</span>
+          <h3>Label Settings</h3>
+          <label for="print-product-select">Select from inventory</label>
+          <select id="print-product-select" aria-label="Select product for label">
+            <option value="">— Custom label —</option>
+          </select>
+          <label for="print-label-name">Product name on label</label>
+          <input type="text" id="print-label-name" placeholder="Product name" aria-label="Label product name" />
+          <label for="print-label-barcode">Barcode number</label>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <input type="text" id="print-label-barcode" placeholder="e.g. 5449000000996" inputmode="numeric" style="flex:1;min-width:140px;margin-bottom:0;" aria-label="Barcode number for label" />
+            <button type="button" class="btn-printer btn-printer-secondary" id="btn-auto-barcode" aria-label="Auto-generate EAN-13 barcode">Auto Generate</button>
+          </div>
+          <label for="print-label-price">Price on label (₦)</label>
+          <input type="number" id="print-label-price" placeholder="350" min="0" aria-label="Price on label" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+              <label for="print-barcode-format">Barcode format</label>
+              <select id="print-barcode-format" aria-label="Barcode format">
+                <option value="EAN13">EAN-13 (Retail)</option>
+                <option value="CODE128">CODE-128 (Internal)</option>
+              </select>
+            </div>
+            <div>
+              <label for="print-label-size">Label size</label>
+              <select id="print-label-size" aria-label="Label size">
+                <option value="small">Small (50mm)</option>
+                <option value="standard" selected>Standard (70mm)</option>
+                <option value="large">Large (90mm)</option>
+              </select>
+            </div>
+          </div>
+          <label for="print-label-copies">Number of labels (copies)</label>
+          <input type="number" id="print-label-copies" value="1" min="1" max="99" aria-label="Number of label copies" />
+          <label for="print-store-name">Store name on label</label>
+          <input type="text" id="print-store-name" value="SmartStock" aria-label="Store name on label" />
+          <div class="printer-btn-row">
+            <button type="button" class="btn-printer btn-printer-primary" id="btn-generate-label" aria-label="Generate barcode label preview">Generate Label</button>
+            <button type="button" class="btn-printer btn-printer-primary" id="btn-print-labels" aria-label="Print labels to printer">Print Labels</button>
+            <button type="button" class="btn-printer btn-printer-secondary" id="btn-print-all-labels" aria-label="Print labels for all inventory">Print All Inventory</button>
+          </div>
+          <p class="printer-hint" id="printer-status-msg" aria-live="polite">Compatible with thermal label printers and standard printers. Use landscape for sheet labels.</p>
+        </div>
+        <div class="printer-preview-panel">
+          <h3>Label Preview</h3>
+          <div class="label-preview-stage">
+            <div class="label-preview-box size-standard" id="label-preview-box">
+              <div class="label-store-name" id="preview-store-name">SmartStock</div>
+              <div class="label-product-name" id="preview-product-name">Product Name</div>
+              <div class="label-price" id="preview-price">₦0</div>
+              <svg id="barcode-svg-preview" aria-label="Barcode preview"></svg>
+            </div>
+          </div>
+          <p class="printer-hint" style="margin-top:1rem;color:#8a8678;">Preview updates when you click Generate Label. Print sends labels to your default printer or label machine.</p>
+        </div>
+      </div>
+    </section>
+
+    <div id="print-sheet" aria-hidden="true"></div>
+
+    <section id="inventory" aria-labelledby="inventory-heading">
+      <h2 class="section-title" id="inventory-heading">Live Inventory</h2>
+      <p class="section-sub">Advanced query filters and real-time stock. Low stock items are highlighted.</p>
+      <div class="query-toolbar" role="search" aria-label="Inventory query filters">
+        <div>
+          <label for="input-query-sku">SKU / Barcode</label>
+          <input type="text" id="input-query-sku" placeholder="Search SKU…" aria-label="Query by SKU or barcode" />
+        </div>
+        <div>
+          <label for="input-query-category">Category</label>
+          <select id="input-query-category" aria-label="Query category">
+            <option value="">All</option>
+            <option value="food">Food</option>
+            <option value="beverages">Beverages</option>
+            <option value="dairy">Dairy</option>
+            <option value="household">Household</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-query-status">Stock Status</label>
+          <select id="input-query-status" aria-label="Query stock status">
+            <option value="">All</option>
+            <option value="low">Low Stock</option>
+            <option value="ok">In Stock</option>
+            <option value="expiring">Expiring Soon</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-query-range">Date Range</label>
+          <select id="input-query-range" aria-label="Query date range">
+            <option value="">Any time</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-query-store">Store Branch</label>
+          <select id="input-query-store" aria-label="Query store branch">
+            <option value="">All branches</option>
+            <option value="lagos-main">Lagos Main</option>
+            <option value="ikeja">Ikeja</option>
+            <option value="lekki">Lekki</option>
+          </select>
+        </div>
+      </div>
+      <input type="search" id="search-input" hidden aria-hidden="true" tabindex="-1" />
+      <select id="category-filter" hidden aria-hidden="true" tabindex="-1"></select>
+      <div class="content-grid">
+        <ul id="inventory-list" aria-live="polite" aria-label="Product inventory list"></ul>
+        <div id="insights-panel" role="region" aria-label="Smart insights dashboard"></div>
+      </div>
+    </section>
+
+    <section id="cctv-monitoring" class="ops-stub-panel" aria-labelledby="cctv-heading">
+      <h3 id="cctv-heading" class="display-font">CCTV Monitoring (IOVS)</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;">Sensor fusion + POS sync for loss prevention. Integration ready per IOVS blueprint.</p>
+      <p style="margin-top:0.5rem;"><span class="pos-status" id="cctv-status">● Cameras Online</span> — <span id="cctv-zones">4 zones active</span></p>
+      <p style="margin-top:0.5rem;color:var(--text-muted);" id="cctv-event">No exceptions in the last audit</p>
+      <div class="ops-action-row">
+        <button type="button" class="btn-scanner btn-scanner-primary" id="btn-cctv-audit">Run Shelf Audit</button>
+      </div>
+    </section>
+
+    <section id="pos-sync" class="ops-stub-panel" aria-labelledby="pos-heading">
+      <h3 id="pos-heading" class="display-font">POS Sync (I-Class)</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;">Real-time sold-status broadcast clears security alarms on checkout.</p>
+      <p style="margin-top:0.5rem;">Status: <span class="pos-status" id="pos-sync-status">Connected</span> · Last sync: <span id="pos-last-sync">—</span></p>
+      <div class="ops-action-row">
+        <button type="button" class="btn-scanner btn-scanner-primary" id="btn-pos-sync">Force Sync Now</button>
+      </div>
+    </section>
+
+    <section id="data-tools" class="ops-stub-panel" aria-labelledby="data-heading">
+      <h3 id="data-heading" class="display-font">Data Management</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;">Back up local inventory, restore another SmartStock export, or reset the demo records.</p>
+      <div class="ops-metric-grid" aria-label="Inventory data summary">
+        <div class="ops-metric">
+          <span>Products</span>
+          <strong id="data-product-count">0</strong>
+        </div>
+        <div class="ops-metric">
+          <span>Stock Value</span>
+          <strong id="data-stock-value">₦0</strong>
+        </div>
+        <div class="ops-metric">
+          <span>Last Updated</span>
+          <strong id="data-last-updated">—</strong>
+        </div>
+      </div>
+      <div class="ops-action-row">
+        <button type="button" class="btn-scanner btn-scanner-primary" id="btn-export-data">Export JSON</button>
+        <label class="btn-scanner btn-scanner-secondary file-button" for="input-import-data">
+          Import JSON
+          <input type="file" id="input-import-data" accept="application/json,.json" aria-label="Import inventory JSON" />
+        </label>
+        <button type="button" class="btn-scanner btn-scanner-secondary" id="btn-reset-demo">Reset Demo Data</button>
+      </div>
+      <p class="scanner-status" id="data-status-msg" aria-live="polite"></p>
+    </section>
+
+    <section class="how-it-works" id="how-it-works" aria-labelledby="how-heading">
+      <h2 class="section-title" id="how-heading">How It Works</h2>
+      <p class="section-sub">Three steps to smarter supermarket operations.</p>
+      <div class="steps">
+        <article class="step">
+          <div class="step-num">01</div>
+          <h3>Register by Barcode</h3>
+          <p>Scan a barcode, enter product details, and register items directly into your live inventory.</p>
+        </article>
+        <article class="step">
+          <div class="step-num">02</div>
+          <h3>Monitor Stock</h3>
+          <p>Live list updates with low-stock badges and smart insights on total value.</p>
+        </article>
+        <article class="step">
+          <div class="step-num">03</div>
+          <h3>Print &amp; Stock</h3>
+          <p>Generate barcode labels for your label machine, print shelf tags, and monitor low-stock alerts.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">SmartStock</div>
+      <form class="footer-form" aria-label="Newsletter signup" onsubmit="return false;">
+        <input type="email" id="input-newsletter-email" placeholder="your@store.com" aria-label="Email for updates" />
+        <button type="button" aria-label="Subscribe">Subscribe</button>
+      </form>
+    </div>
+    <p style="max-width:1200px;margin-left:auto;margin-right:auto;padding:0 1.5rem;">© 2026 SmartStock — Lagos Retail Intelligence. Client-side demo.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
